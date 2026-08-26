@@ -119,6 +119,14 @@ public class Song implements Persistable {
     }
 
     @Override
+    public String toString() {
+        String favoriteMark = favorite ? "[Favorite] " : "";
+        return favoriteMark + "#" + id + " - " + title + " - " + artist
+                + " (" + album + ") [" + genre + "] " + durationInSeconds + "s"
+                + " | Play count: " + playCount + " | Rating: " + rating;
+    }
+
+    @Override
     public String toDataString() {
         return id + "|" + title + "|" + artist + "|" + album + "|" + genre + "|"
                 + durationInSeconds + "|" + playCount + "|" + rating + "|" + favorite;
