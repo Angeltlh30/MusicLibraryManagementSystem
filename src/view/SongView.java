@@ -21,7 +21,7 @@ public class SongView {
         int choice;
         do {
             printMenu();
-            choice = Inputter.getAnInteger("Enter your choice: ", "Invalid choice, please try again: ", 0, 5);
+            choice = Inputter.getAnInteger("Enter your choice: ", "Invalid choice, please try again: ", 0, 6);
             handleChoice(choice);
         } while (choice != 0);
     }
@@ -34,6 +34,7 @@ public class SongView {
         System.out.println("3. View song detail");
         System.out.println("4. Update song");
         System.out.println("5. Delete song");
+        System.out.println("6. Search song");
         System.out.println("0. Back");
     }
 
@@ -53,6 +54,9 @@ public class SongView {
                 break;
             case 5:
                 deleteSong();
+                break;
+            case 6:
+                searchSong();
                 break;
             case 0:
                 System.out.println("Back to main menu.");
@@ -150,6 +154,34 @@ public class SongView {
         } catch (SongNotFoundException e) {
             System.out.println("Error: " + e.getMessage());
         }
+    }
+
+    private void searchSong() {
+        System.out.println("Search by:");
+        System.out.println("1. Title");
+        System.out.println("2. Artist");
+        System.out.println("3. Genre");
+        int type = Inputter.getAnInteger("Enter your choice: ", "Invalid choice, please try again: ", 1, 3);
+        String keyword = Inputter.getAString("Enter keyword: ", "Keyword must not be empty: ");
+
+        List<Song> result;
+        switch (type) {
+            case 1:
+                result = songController.searchByTitle(keyword);
+                break;
+            case 2:
+                result = songController.searchByArtist(keyword);
+                break;
+            default:
+                result = songController.searchByGenre(keyword);
+                break;
+        }
+
+        if (result.isEmpty()) {
+            System.out.println("No songs found.");
+            return;
+        }
+        printSongsTable(result);
     }
 
     private void printSongsTable(List<Song> songs) {

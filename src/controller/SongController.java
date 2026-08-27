@@ -1,5 +1,6 @@
 package controller;
 
+import algorithms.LinearSearch;
 import data.SongRepository;
 import java.util.List;
 import model.Song;
@@ -67,6 +68,18 @@ public class SongController {
     public void deleteSong(int id) throws SongNotFoundException {
         getSongById(id);
         songRepository.deleteById(id);
+    }
+
+    public List<Song> searchByTitle(String title) {
+        return LinearSearch.searchByTitle(songRepository.getAll(), title);
+    }
+
+    public List<Song> searchByArtist(String artist) {
+        return LinearSearch.searchByArtist(songRepository.getAll(), artist);
+    }
+
+    public List<Song> searchByGenre(String genre) {
+        return LinearSearch.searchByGenre(songRepository.getAll(), genre);
     }
 
     private String normalize(String value) {
