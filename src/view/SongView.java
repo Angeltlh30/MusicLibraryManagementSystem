@@ -11,9 +11,7 @@ public class SongView {
 
     private SongController songController;
 
-    private static final String[] TABLE_HEADERS = {
-        "ID", "Title", "Artist", "Album", "Genre", "Duration", "Play count", "Rating", "Favorite"
-    };
+    public static final String[] TABLE_HEADERS = { "ID", "Title", "Artist", "Album", "Genre", "Duration", "Play count", "Rating", "Favorite"  };
 
     public SongView() {
         this.songController = new SongController();
@@ -36,7 +34,7 @@ public class SongView {
         System.out.println("3. View song detail");
         System.out.println("4. Update song");
         System.out.println("5. Delete song");
-        System.out.println("0. Exit");
+        System.out.println("0. Back");
     }
 
     private void handleChoice(int choice) {
@@ -57,7 +55,7 @@ public class SongView {
                 deleteSong();
                 break;
             case 0:
-                System.out.println("Goodbye!");
+                System.out.println("Back to main menu.");
                 break;
         }
     }
@@ -155,6 +153,10 @@ public class SongView {
     }
 
     private void printSongsTable(List<Song> songs) {
+        ConsoleTablePrinter.printTable(TABLE_HEADERS, buildRows(songs));
+    }
+
+    public static String[][] buildRows(List<Song> songs) {
         String[][] rows = new String[songs.size()][TABLE_HEADERS.length];
         for (int i = 0; i < songs.size(); i++) {
             Song s = songs.get(i);
@@ -168,50 +170,6 @@ public class SongView {
             rows[i][7] = String.valueOf(s.getRating());
             rows[i][8] = s.isFavorite() ? "Yes" : "No";
         }
-
-        int[] widths = new int[TABLE_HEADERS.length];
-        for (int c = 0; c < TABLE_HEADERS.length; c++) {
-            widths[c] = TABLE_HEADERS[c].length();
-        }
-        for (String[] row : rows) {
-            for (int c = 0; c < row.length; c++) {
-                String value = row[c] == null ? "" : row[c];
-                if (value.length() > widths[c]) {
-                    widths[c] = value.length();
-                }
-            }
-        }
-
-        printTableSeparator(widths);
-        printTableRow(TABLE_HEADERS, widths);
-        printTableSeparator(widths);
-        for (String[] row : rows) {
-            printTableRow(row, widths);
-        }
-        printTableSeparator(widths);
-    }
-
-    private void printTableSeparator(int[] widths) {
-        StringBuilder line = new StringBuilder("+");
-        for (int w : widths) {
-            for (int i = 0; i < w + 2; i++) {
-                line.append('-');
-            }
-            line.append('+');
-        }
-        System.out.println(line);
-    }
-
-    private void printTableRow(String[] cells, int[] widths) {
-        StringBuilder line = new StringBuilder("|");
-        for (int c = 0; c < cells.length; c++) {
-            String value = cells[c] == null ? "" : cells[c];
-            line.append(' ').append(value);
-            for (int i = value.length(); i < widths[c]; i++) {
-                line.append(' ');
-            }
-            line.append(" |");
-        }
-        System.out.println(line);
+        return rows;
     }
 }

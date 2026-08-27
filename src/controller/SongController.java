@@ -27,9 +27,9 @@ public class SongController {
     }
 
     public Song addSong(String title, String artist, String album, String genre, int durationInSeconds) {
-        Validator.requireNonEmpty(title, "Ten bai hat");
-        Validator.requireNonEmpty(artist, "Ca si");
-        Validator.requirePositive(durationInSeconds, "Thoi luong");
+        Validator.requireNonEmpty(title, "Song title");
+        Validator.requireNonEmpty(artist, "Artist");
+        Validator.requirePositive(durationInSeconds, "Duration");
 
         int id = songRepository.generateNextId();
         Song song = new Song(id, title.trim(), artist.trim(), normalize(album), normalize(genre), durationInSeconds);
@@ -42,11 +42,11 @@ public class SongController {
         Song song = getSongById(id);
 
         if (title != null) {
-            Validator.requireNonEmpty(title, "Ten bai hat");
+            Validator.requireNonEmpty(title, "Song title");
             song.setTitle(title.trim());
         }
         if (artist != null) {
-            Validator.requireNonEmpty(artist, "Ca si");
+            Validator.requireNonEmpty(artist, "Artist");
             song.setArtist(artist.trim());
         }
         if (album != null) {
@@ -56,7 +56,7 @@ public class SongController {
             song.setGenre(normalize(genre));
         }
         if (durationInSeconds != null) {
-            Validator.requirePositive(durationInSeconds, "Thoi luong");
+            Validator.requirePositive(durationInSeconds, "Duration");
             song.setDurationInSeconds(durationInSeconds);
         }
 
