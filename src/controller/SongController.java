@@ -37,18 +37,29 @@ public class SongController {
         return song;
     }
 
-    public Song updateSong(int id, String title, String artist, String album, String genre, int durationInSeconds)
+    public Song updateSong(int id, String title, String artist, String album, String genre, Integer durationInSeconds)
             throws SongNotFoundException {
         Song song = getSongById(id);
-        Validator.requireNonEmpty(title, "Ten bai hat");
-        Validator.requireNonEmpty(artist, "Ca si");
-        Validator.requirePositive(durationInSeconds, "Thoi luong");
 
-        song.setTitle(title.trim());
-        song.setArtist(artist.trim());
-        song.setAlbum(normalize(album));
-        song.setGenre(normalize(genre));
-        song.setDurationInSeconds(durationInSeconds);
+        if (title != null) {
+            Validator.requireNonEmpty(title, "Ten bai hat");
+            song.setTitle(title.trim());
+        }
+        if (artist != null) {
+            Validator.requireNonEmpty(artist, "Ca si");
+            song.setArtist(artist.trim());
+        }
+        if (album != null) {
+            song.setAlbum(normalize(album));
+        }
+        if (genre != null) {
+            song.setGenre(normalize(genre));
+        }
+        if (durationInSeconds != null) {
+            Validator.requirePositive(durationInSeconds, "Thoi luong");
+            song.setDurationInSeconds(durationInSeconds);
+        }
+
         songRepository.update(song);
         return song;
     }
