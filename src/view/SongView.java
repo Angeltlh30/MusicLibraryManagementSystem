@@ -21,7 +21,7 @@ public class SongView {
         int choice;
         do {
             printMenu();
-            choice = Inputter.getAnInteger("Enter your choice: ", "Invalid choice, please try again: ", 0, 6);
+            choice = Inputter.getAnInteger("Enter your choice: ", "Invalid choice, please try again: ", 0, 7);
             handleChoice(choice);
         } while (choice != 0);
     }
@@ -35,6 +35,7 @@ public class SongView {
         System.out.println("4. Update song");
         System.out.println("5. Delete song");
         System.out.println("6. Search song");
+        System.out.println("7. Sort song list");
         System.out.println("0. Back");
     }
 
@@ -57,6 +58,9 @@ public class SongView {
                 break;
             case 6:
                 searchSong();
+                break;
+            case 7:
+                sortSongs();
                 break;
             case 0:
                 System.out.println("Back to main menu.");
@@ -181,6 +185,41 @@ public class SongView {
             System.out.println("No songs found.");
             return;
         }
+        printSongsTable(result);
+    }
+
+    private void sortSongs() {
+        List<Song> songs = songController.getAllSongs();
+        if (songs.isEmpty()) {
+            System.out.println("No songs yet.");
+            return;
+        }
+
+        System.out.println("Sort by:");
+        System.out.println("1. Title");
+        System.out.println("2. Artist");
+        System.out.println("3. Duration");
+        int criterion = Inputter.getAnInteger("Enter your choice: ", "Invalid choice, please try again: ", 1, 3);
+
+        System.out.println("Order:");
+        System.out.println("1. Ascending");
+        System.out.println("2. Descending");
+        int order = Inputter.getAnInteger("Enter your choice: ", "Invalid choice, please try again: ", 1, 2);
+        boolean ascending = order == 1;
+
+        List<Song> result;
+        switch (criterion) {
+            case 1:
+                result = songController.sortByTitle(ascending);
+                break;
+            case 2:
+                result = songController.sortByArtist(ascending);
+                break;
+            default:
+                result = songController.sortByDuration(ascending);
+                break;
+        }
+
         printSongsTable(result);
     }
 
