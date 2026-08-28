@@ -14,9 +14,6 @@ public class PlaylistRepository extends FileHandler<Playlist> {
     public PlaylistRepository() {
         this.playlists = new ArrayList<>();
         load(FILE_PATH, playlists);
-        if (renumberIds()) {
-            save(playlists, FILE_PATH);
-        }
     }
 
     @Override
@@ -99,20 +96,6 @@ public class PlaylistRepository extends FileHandler<Playlist> {
             return false;
         }
         playlists.remove(existing);
-        renumberIds();
         return save(playlists, FILE_PATH);
-    }
-
-    private boolean renumberIds() {
-        boolean changed = false;
-        int nextId = 1;
-        for (Playlist playlist : playlists) {
-            if (playlist.getId() != nextId) {
-                playlist.setId(nextId);
-                changed = true;
-            }
-            nextId++;
-        }
-        return changed;
     }
 }

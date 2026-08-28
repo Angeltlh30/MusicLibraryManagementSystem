@@ -14,9 +14,6 @@ public class SongRepository extends FileHandler<Song> {
     public SongRepository() {
         this.songs = new ArrayList<>();
         load(FILE_PATH, songs);
-        if (renumberIds()) {
-            save(songs, FILE_PATH);
-        }
     }
 
     @Override
@@ -90,20 +87,6 @@ public class SongRepository extends FileHandler<Song> {
             return false;
         }
         songs.remove(existing);
-        renumberIds();
         return save(songs, FILE_PATH);
-    }
-
-    private boolean renumberIds() {
-        boolean changed = false;
-        int nextId = 1;
-        for (Song song : songs) {
-            if (song.getId() != nextId) {
-                song.setId(nextId);
-                changed = true;
-            }
-            nextId++;
-        }
-        return changed;
     }
 }
