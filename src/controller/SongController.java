@@ -72,6 +72,13 @@ public class SongController {
         songRepository.deleteById(id);
     }
 
+    public Song toggleFavorite(int id) throws SongNotFoundException {
+        Song song = getSongById(id);
+        song.setFavorite(!song.isFavorite());
+        songRepository.update(song);
+        return song;
+    }
+
     public List<Song> searchByTitle(String title) {
         return LinearSearch.searchByTitle(songRepository.getAll(), title);
     }

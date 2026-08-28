@@ -21,7 +21,7 @@ public class SongView {
         int choice;
         do {
             printMenu();
-            choice = Inputter.getAnInteger("Enter your choice: ", "Invalid choice, please try again: ", 0, 7);
+            choice = Inputter.getAnInteger("Enter your choice: ", "Invalid choice, please try again: ", 0, 8);
             handleChoice(choice);
         } while (choice != 0);
     }
@@ -36,6 +36,7 @@ public class SongView {
         System.out.println("5. Delete song");
         System.out.println("6. Search song");
         System.out.println("7. Sort song list");
+        System.out.println("8. Mark/Unmark favorite");
         System.out.println("0. Back");
     }
 
@@ -61,6 +62,9 @@ public class SongView {
                 break;
             case 7:
                 sortSongs();
+                break;
+            case 8:
+                toggleFavorite();
                 break;
             case 0:
                 System.out.println("Back to main menu.");
@@ -221,6 +225,17 @@ public class SongView {
         }
 
         printSongsTable(result);
+    }
+
+    private void toggleFavorite() {
+        int id = Inputter.getAnPositiveInteger("Enter song id: ", "Id must be a positive integer: ");
+        try {
+            Song song = songController.toggleFavorite(id);
+            System.out.println(song.isFavorite() ? "Song marked as favorite." : "Song removed from favorites.");
+            printSongsTable(Collections.singletonList(song));
+        } catch (SongNotFoundException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
     }
 
     private void printSongsTable(List<Song> songs) {

@@ -1,3 +1,4 @@
-1|Treat You Better|Shawn Mendes|||300|0|0.0|false
-2|Baby|Justin Bieber|15||300|0|0.0|false
+1|Treat You Better|Shawn Mendes|||300|0|0.0|true
+2|Baby|Justin Bieber|15||300|0|0.0|true
 3|Treat you better|Shawn Mendes||rock|450|0|0.0|false
+4|Muahah|An|||200|0|0.0|true
