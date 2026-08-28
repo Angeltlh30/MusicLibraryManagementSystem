@@ -71,7 +71,7 @@ public class PlaylistView {
     }
 
     private void createPlaylist() {
-        String name = Inputter.getAString("Enter playlist name: ", "Playlist name must not be empty: ");
+        String name = promptUniquePlaylistName(null, null);
         String description = Inputter.getAString("Enter description (optional): ");
 
         try {
@@ -117,7 +117,7 @@ public class PlaylistView {
         printPlaylistsTable(Collections.singletonList(existing));
         System.out.println("Press Enter to keep the current value for a field.");
 
-        String name = Inputter.getAString("Enter new name (current: " + existing.getName() + "): ");
+        String name = promptUniquePlaylistName(existing.getName(), existing.getId());
         String description = Inputter.getAString("Enter new description (current: " + existing.getDescription() + "): ");
 
         try {
@@ -126,6 +126,32 @@ public class PlaylistView {
             printPlaylistsTable(Collections.singletonList(updated));
         } catch (PlaylistNotFoundException | IllegalArgumentException e) {
             System.out.println("Error: " + e.getMessage());
+        }
+    }
+
+    private String promptUniquePlaylistName(String currentName, Integer excludeId) {
+        boolean isUpdate = currentName != null;
+        while (true) {
+            String name;
+            if (isUpdate) {
+                name = Inputter.getAString("Enter new name (current: " + currentName + "): ");
+                if (name == null) {
+                    return null;
+                }
+            } else {
+                name = Inputter.getAString("Enter playlist name: ", "Playlist name must not be empty: ");
+            }
+
+            if (playlistController.isPlaylistNameTaken(name, excludeId)) {
+                if (isUpdate) {
+                    System.out.println("Error: Playlist name \"" + name + "\" already exists. "
+                            + "Enter a different name, or press Enter to keep the current name (" + currentName + ").");
+                } else {
+                    System.out.println("Error: Playlist name \"" + name + "\" already exists. Please enter a different name.");
+                }
+                continue;
+            }
+            return name;
         }
     }
 
@@ -157,6 +183,13 @@ public class PlaylistView {
 
     private void addSongToPlaylist() {
         int playlistId = Inputter.getAnPositiveInteger("Enter playlist id: ", "Id must be a positive integer: ");
+        try {
+            playlistController.getPlaylistById(playlistId);
+        } catch (PlaylistNotFoundException e) {
+            System.out.println("Error: " + e.getMessage());
+            return;
+        }
+
         int songId = Inputter.getAnPositiveInteger("Enter song id to add: ", "Id must be a positive integer: ");
 
         try {
@@ -170,6 +203,19 @@ public class PlaylistView {
 
     private void removeSongFromPlaylist() {
         int playlistId = Inputter.getAnPositiveInteger("Enter playlist id: ", "Id must be a positive integer: ");
+        Playlist playlist;
+        try {
+            playlist = playlistController.getPlaylistById(playlistId);
+        } catch (PlaylistNotFoundException e) {
+            System.out.println("Error: " + e.getMessage());
+            return;
+        }
+
+        if (playlist.getSongCount() == 0) {
+            System.out.println("This playlist has no songs to remove.");
+            return;
+        }
+
         int songId = Inputter.getAnPositiveInteger("Enter song id to remove: ", "Id must be a positive integer: ");
 
         try {

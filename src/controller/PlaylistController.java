@@ -32,6 +32,13 @@ public class PlaylistController {
         return playlist;
     }
 
+    public boolean isPlaylistNameTaken(String name, Integer excludeId) {
+        if (name == null || name.trim().isEmpty()) {
+            return false;
+        }
+        return playlistRepository.existsByName(name.trim(), excludeId);
+    }
+
     public Playlist createPlaylist(String name, String description) {
         Validator.requireNonEmpty(name, "Playlist name");
 

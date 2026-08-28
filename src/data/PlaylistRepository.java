@@ -56,6 +56,18 @@ public class PlaylistRepository extends FileHandler<Playlist> {
         return null;
     }
 
+    public boolean existsByName(String name, Integer excludeId) {
+        for (Playlist playlist : playlists) {
+            if (excludeId != null && playlist.getId() == excludeId) {
+                continue;
+            }
+            if (playlist.getName().equalsIgnoreCase(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public int generateNextId() {
         int maxId = 0;
         for (Playlist playlist : playlists) {
