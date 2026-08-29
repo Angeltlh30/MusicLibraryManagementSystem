@@ -23,7 +23,7 @@ public class PlaylistView {
         int choice;
         do {
             printMenu();
-            choice = Inputter.getAnInteger("Enter your choice: ", "Invalid choice, please try again: ", 0, 8);
+            choice = Inputter.getAnInteger("Enter your choice: ", "Invalid choice, please try again: ", 0, 10);
             handleChoice(choice);
         } while (choice != 0);
     }
@@ -39,6 +39,8 @@ public class PlaylistView {
         System.out.println("6. Add song to playlist");
         System.out.println("7. Remove song from playlist");
         System.out.println("8. Search songs in playlist");
+        System.out.println("9. Undo last add/remove song");
+        System.out.println("10. Redo last undone action");
         System.out.println("0. Back");
     }
 
@@ -67,6 +69,12 @@ public class PlaylistView {
                 break;
             case 8:
                 searchSongsInPlaylist();
+                break;
+            case 9:
+                undoAction();
+                break;
+            case 10:
+                redoAction();
                 break;
             case 0:
                 System.out.println("Back to main menu.");
@@ -270,6 +278,28 @@ public class PlaylistView {
             return;
         }
         ConsoleTablePrinter.printTable(SongView.TABLE_HEADERS, SongView.buildRows(result));
+    }
+
+    private void undoAction() {
+        try {
+            String message = playlistController.undo();
+            System.out.println(message);
+        } catch (IllegalStateException e) {
+            System.out.println(e.getMessage());
+        } catch (PlaylistNotFoundException | SongNotFoundException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+
+    private void redoAction() {
+        try {
+            String message = playlistController.redo();
+            System.out.println(message);
+        } catch (IllegalStateException e) {
+            System.out.println(e.getMessage());
+        } catch (PlaylistNotFoundException | SongNotFoundException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
     }
 
     private void printSongsInPlaylist(int playlistId) {

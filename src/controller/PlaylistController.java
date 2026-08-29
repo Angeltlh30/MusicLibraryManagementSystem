@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import model.Playlist;
 import model.Song;
+import structures.Stack;
 import util.PlaylistNotFoundException;
 import util.SongNotFoundException;
 import util.Validator;
@@ -15,10 +16,14 @@ public class PlaylistController {
 
     private PlaylistRepository playlistRepository;
     private SongRepository songRepository;
+    private Stack<PlaylistAction> undoStack;
+    private Stack<PlaylistAction> redoStack;
 
     public PlaylistController() {
         this.playlistRepository = new PlaylistRepository();
         this.songRepository = new SongRepository();
+        this.undoStack = new Stack<>();
+        this.redoStack = new Stack<>();
     }
 
     public List<Playlist> getAllPlaylists() {
@@ -70,28 +75,59 @@ public class PlaylistController {
     }
 
     public Playlist addSongToPlaylist(int playlistId, int songId) throws PlaylistNotFoundException, SongNotFoundException {
-        Playlist playlist = getPlaylistById(playlistId);
-        Song song = songRepository.findById(songId);
-        if (song == null) {
-            throw new SongNotFoundException(songId);
-        }
-        if (playlist.containsSongId(songId)) {
-            throw new IllegalArgumentException("Song #" + songId + " is already in this playlist");
-        }
-
-        playlist.addSongId(songId);
-        playlistRepository.update(playlist);
-        return playlist;
+        applyAddSong(playlistId, songId);
+        undoStack.push(new PlaylistAction(PlaylistAction.ADD_SONG, playlistId, songId));
+        redoStack.clear();
+        return getPlaylistById(playlistId);
     }
 
     public Playlist removeSongFromPlaylist(int playlistId, int songId) throws PlaylistNotFoundException {
-        Playlist playlist = getPlaylistById(playlistId);
-        if (!playlist.removeSongId(songId)) {
-            throw new IllegalArgumentException("Song #" + songId + " is not in this playlist");
+        applyRemoveSong(playlistId, songId);
+        undoStack.push(new PlaylistAction(PlaylistAction.REMOVE_SONG, playlistId, songId));
+        redoStack.clear();
+        return getPlaylistById(playlistId);
+    }
+
+    public boolean canUndo() {
+        return !undoStack.isEmpty();
+    }
+
+    public boolean canRedo() {
+        return !redoStack.isEmpty();
+    }
+
+    public String undo() throws PlaylistNotFoundException, SongNotFoundException {
+        if (undoStack.isEmpty()) {
+            throw new IllegalStateException("Nothing to undo.");
         }
 
-        playlistRepository.update(playlist);
-        return playlist;
+        PlaylistAction action = undoStack.pop();
+        if (action.type == PlaylistAction.ADD_SONG) {
+            applyRemoveSong(action.playlistId, action.songId);
+            redoStack.push(action);
+            return "Undid: add song #" + action.songId + " to playlist #" + action.playlistId;
+        } else {
+            applyAddSong(action.playlistId, action.songId);
+            redoStack.push(action);
+            return "Undid: remove song #" + action.songId + " from playlist #" + action.playlistId;
+        }
+    }
+
+    public String redo() throws PlaylistNotFoundException, SongNotFoundException {
+        if (redoStack.isEmpty()) {
+            throw new IllegalStateException("Nothing to redo.");
+        }
+
+        PlaylistAction action = redoStack.pop();
+        if (action.type == PlaylistAction.ADD_SONG) {
+            applyAddSong(action.playlistId, action.songId);
+            undoStack.push(action);
+            return "Redid: add song #" + action.songId + " to playlist #" + action.playlistId;
+        } else {
+            applyRemoveSong(action.playlistId, action.songId);
+            undoStack.push(action);
+            return "Redid: remove song #" + action.songId + " from playlist #" + action.playlistId;
+        }
     }
 
     public List<Song> getSongsInPlaylist(int playlistId) throws PlaylistNotFoundException {
@@ -118,7 +154,45 @@ public class PlaylistController {
         return LinearSearch.searchByGenre(getSongsInPlaylist(playlistId), genre);
     }
 
+    private void applyAddSong(int playlistId, int songId) throws PlaylistNotFoundException, SongNotFoundException {
+        Playlist playlist = getPlaylistById(playlistId);
+        Song song = songRepository.findById(songId);
+        if (song == null) {
+            throw new SongNotFoundException(songId);
+        }
+        if (playlist.containsSongId(songId)) {
+            throw new IllegalArgumentException("Song #" + songId + " is already in this playlist");
+        }
+
+        playlist.addSongId(songId);
+        playlistRepository.update(playlist);
+    }
+
+    private void applyRemoveSong(int playlistId, int songId) throws PlaylistNotFoundException {
+        Playlist playlist = getPlaylistById(playlistId);
+        if (!playlist.removeSongId(songId)) {
+            throw new IllegalArgumentException("Song #" + songId + " is not in this playlist");
+        }
+
+        playlistRepository.update(playlist);
+    }
+
     private String normalize(String value) {
         return value == null ? "" : value.trim();
+    }
+
+    private static class PlaylistAction {
+        private static final int ADD_SONG = 0;
+        private static final int REMOVE_SONG = 1;
+
+        private final int type;
+        private final int playlistId;
+        private final int songId;
+
+        private PlaylistAction(int type, int playlistId, int songId) {
+            this.type = type;
+            this.playlistId = playlistId;
+            this.songId = songId;
+        }
     }
 }
