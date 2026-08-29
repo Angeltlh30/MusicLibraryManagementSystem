@@ -23,7 +23,7 @@ public class PlaylistView {
         int choice;
         do {
             printMenu();
-            choice = Inputter.getAnInteger("Enter your choice: ", "Invalid choice, please try again: ", 0, 7);
+            choice = Inputter.getAnInteger("Enter your choice: ", "Invalid choice, please try again: ", 0, 8);
             handleChoice(choice);
         } while (choice != 0);
     }
@@ -38,6 +38,7 @@ public class PlaylistView {
         System.out.println("5. Delete playlist");
         System.out.println("6. Add song to playlist");
         System.out.println("7. Remove song from playlist");
+        System.out.println("8. Search songs in playlist");
         System.out.println("0. Back");
     }
 
@@ -63,6 +64,9 @@ public class PlaylistView {
                 break;
             case 7:
                 removeSongFromPlaylist();
+                break;
+            case 8:
+                searchSongsInPlaylist();
                 break;
             case 0:
                 System.out.println("Back to main menu.");
@@ -225,6 +229,47 @@ public class PlaylistView {
         } catch (PlaylistNotFoundException | IllegalArgumentException e) {
             System.out.println("Error: " + e.getMessage());
         }
+    }
+
+    private void searchSongsInPlaylist() {
+        int playlistId = Inputter.getAnPositiveInteger("Enter playlist id: ", "Id must be a positive integer: ");
+        try {
+            playlistController.getPlaylistById(playlistId);
+        } catch (PlaylistNotFoundException e) {
+            System.out.println("Error: " + e.getMessage());
+            return;
+        }
+
+        System.out.println("Search by:");
+        System.out.println("1. Title");
+        System.out.println("2. Artist");
+        System.out.println("3. Genre");
+        int type = Inputter.getAnInteger("Enter your choice: ", "Invalid choice, please try again: ", 1, 3);
+        String keyword = Inputter.getAString("Enter keyword: ", "Keyword must not be empty: ");
+
+        List<Song> result;
+        try {
+            switch (type) {
+                case 1:
+                    result = playlistController.searchSongsInPlaylistByTitle(playlistId, keyword);
+                    break;
+                case 2:
+                    result = playlistController.searchSongsInPlaylistByArtist(playlistId, keyword);
+                    break;
+                default:
+                    result = playlistController.searchSongsInPlaylistByGenre(playlistId, keyword);
+                    break;
+            }
+        } catch (PlaylistNotFoundException e) {
+            System.out.println("Error: " + e.getMessage());
+            return;
+        }
+
+        if (result.isEmpty()) {
+            System.out.println("No songs found.");
+            return;
+        }
+        ConsoleTablePrinter.printTable(SongView.TABLE_HEADERS, SongView.buildRows(result));
     }
 
     private void printSongsInPlaylist(int playlistId) {

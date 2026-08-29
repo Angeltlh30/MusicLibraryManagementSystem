@@ -1,3 +1,6 @@
 1|Ho Binh|This is my favourite|2,1
 2|Ho Binh|Rock|
 3|Kieu Nhi||
+4|Rap Viet|Rap collection|
+5|Chill Acoustic|Relaxing acoustic tracks|
+6|EDM Party|High energy EDM|

@@ -2,3 +2,13 @@
 2|Baby|Justin Bieber|15||300|1|0.0|true
 3|Treat you better|Shawn Mendes||rock|450|0|0.0|false
 4|Muahah|An|||200|0|0.0|true
+5|Shape of You|Ed Sheeran|Divide|Pop|233|0|0.0|false
+6|Blinding Lights|The Weeknd|After Hours|Synth-pop|200|0|0.0|false
+7|Someone Like You|Adele|21|Pop|285|0|0.0|false
+8|Bohemian Rhapsody|Queen|A Night at the Opera|Rock|354|0|0.0|false
+9|Rolling in the Deep|Adele|21|Pop|228|0|0.0|false
+10|Uptown Funk|Mark Ronson ft. Bruno Mars|Uptown Special|Funk|270|0|0.0|false
+11|Counting Stars|OneRepublic|Native|Pop Rock|257|0|0.0|false
+12|Perfect|Ed Sheeran|Divide|Pop|263|0|0.0|false
+13|Radioactive|Imagine Dragons|Night Visions|Alternative Rock|186|0|0.0|false
+14|Thinking Out Loud|Ed Sheeran|Multiply|Soul|281|0|0.0|true

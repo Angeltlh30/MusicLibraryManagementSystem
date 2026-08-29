@@ -1,5 +1,6 @@
 package controller;
 
+import algorithms.LinearSearch;
 import data.PlaylistRepository;
 import data.SongRepository;
 import java.util.ArrayList;
@@ -103,6 +104,18 @@ public class PlaylistController {
             }
         }
         return songs;
+    }
+
+    public List<Song> searchSongsInPlaylistByTitle(int playlistId, String title) throws PlaylistNotFoundException {
+        return LinearSearch.searchByTitle(getSongsInPlaylist(playlistId), title);
+    }
+
+    public List<Song> searchSongsInPlaylistByArtist(int playlistId, String artist) throws PlaylistNotFoundException {
+        return LinearSearch.searchByArtist(getSongsInPlaylist(playlistId), artist);
+    }
+
+    public List<Song> searchSongsInPlaylistByGenre(int playlistId, String genre) throws PlaylistNotFoundException {
+        return LinearSearch.searchByGenre(getSongsInPlaylist(playlistId), genre);
     }
 
     private String normalize(String value) {
