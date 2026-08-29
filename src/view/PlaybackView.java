@@ -8,8 +8,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import model.HistoryEntry;
+import model.Playlist;
 import model.Song;
 import util.Inputter;
+import util.PlaylistNotFoundException;
 import util.SongNotFoundException;
 
 public class PlaybackView {
@@ -29,7 +31,7 @@ public class PlaybackView {
         int choice;
         do {
             printMenu();
-            choice = Inputter.getAnInteger("Enter your choice: ", "Invalid choice, please try again: ", 0, 2);
+            choice = Inputter.getAnInteger("Enter your choice: ", "Invalid choice, please try again: ", 0, 3);
             handleChoice(choice);
         } while (choice != 0);
     }
@@ -38,7 +40,8 @@ public class PlaybackView {
         System.out.println();
         System.out.println("========== PLAYBACK ==========");
         System.out.println("1. Play a song");
-        System.out.println("2. View recently played");
+        System.out.println("2. Play a playlist");
+        System.out.println("3. View recently played");
         System.out.println("0. Back");
     }
 
@@ -48,6 +51,9 @@ public class PlaybackView {
                 playSong();
                 break;
             case 2:
+                playPlaylist();
+                break;
+            case 3:
                 viewRecentlyPlayed();
                 break;
             case 0:
@@ -63,6 +69,47 @@ public class PlaybackView {
             System.out.println("Now playing:");
             printSongsTable(Collections.singletonList(song));
         } catch (SongNotFoundException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+
+    private void playPlaylist() {
+        int playlistId = Inputter.getAnPositiveInteger("Enter playlist id: ", "Id must be a positive integer: ");
+        Playlist playlist;
+        try {
+            playlist = playbackController.getPlaylistById(playlistId);
+        } catch (PlaylistNotFoundException e) {
+            System.out.println("Error: " + e.getMessage());
+            return;
+        }
+
+        if (playlist.getSongCount() == 0) {
+            System.out.println("This playlist has no songs to play.");
+            return;
+        }
+
+        boolean shuffle = Inputter.getYesNo("Shuffle play order? (Y/N): ", "Please enter Y or N: ");
+
+        System.out.println("Repeat mode:");
+        System.out.println("0. No repeat");
+        System.out.println("1. Repeat all");
+        System.out.println("2. Repeat one song");
+        int repeatMode = Inputter.getAnInteger("Enter your choice: ", "Invalid choice, please try again: ", 0, 2);
+
+        Integer repeatSongId = null;
+        int rounds = 1;
+        if (repeatMode == PlaybackController.REPEAT_ALL) {
+            rounds = Inputter.getAnPositiveInteger("How many times to loop through the playlist? ", "Must be a positive integer: ");
+        } else if (repeatMode == PlaybackController.REPEAT_ONE) {
+            repeatSongId = Inputter.getAnPositiveInteger("Enter id of the song to repeat: ", "Id must be a positive integer: ");
+            rounds = Inputter.getAnPositiveInteger("How many times to repeat this song? ", "Must be a positive integer: ");
+        }
+
+        try {
+            List<Song> playedOrder = playbackController.playPlaylist(playlistId, shuffle, repeatMode, repeatSongId, rounds);
+            System.out.println("Playback finished. Play order:");
+            printSongsTable(playedOrder);
+        } catch (PlaylistNotFoundException | SongNotFoundException | IllegalArgumentException e) {
             System.out.println("Error: " + e.getMessage());
         }
     }
