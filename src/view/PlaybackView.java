@@ -27,25 +27,7 @@ public class PlaybackView {
         this.playbackController = new PlaybackController(songRepository, playlistRepository, historyRepository);
     }
 
-    public void showMenu() {
-        int choice;
-        do {
-            printMenu();
-            choice = Inputter.getAnInteger("Enter your choice: ", "Invalid choice, please try again: ", 0, 3);
-            handleChoice(choice);
-        } while (choice != 0);
-    }
-
-    private void printMenu() {
-        System.out.println();
-        System.out.println("========== PLAYBACK ==========");
-        System.out.println("1. Play a song");
-        System.out.println("2. Play a playlist");
-        System.out.println("3. View recently played");
-        System.out.println("0. Back");
-    }
-
-    private void handleChoice(int choice) {
+    void handleChoice(int choice) {
         switch (choice) {
             case 1:
                 playSong();
@@ -55,9 +37,6 @@ public class PlaybackView {
                 break;
             case 3:
                 viewRecentlyPlayed();
-                break;
-            case 0:
-                System.out.println("Back to main menu.");
                 break;
         }
     }
@@ -69,7 +48,7 @@ public class PlaybackView {
             System.out.println("Now playing:");
             printSongsTable(Collections.singletonList(song));
         } catch (SongNotFoundException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println(AnsiColors.colorize("Error: " + e.getMessage(), AnsiColors.ERROR));
         }
     }
 
@@ -79,7 +58,7 @@ public class PlaybackView {
         try {
             playlist = playbackController.getPlaylistById(playlistId);
         } catch (PlaylistNotFoundException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println(AnsiColors.colorize("Error: " + e.getMessage(), AnsiColors.ERROR));
             return;
         }
 
@@ -110,7 +89,7 @@ public class PlaybackView {
             System.out.println("Playback finished. Play order:");
             printSongsTable(playedOrder);
         } catch (PlaylistNotFoundException | SongNotFoundException | IllegalArgumentException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println(AnsiColors.colorize("Error: " + e.getMessage(), AnsiColors.ERROR));
         }
     }
 
@@ -135,8 +114,8 @@ public class PlaybackView {
             HistoryEntry entry = entries.get(i);
             Song song = playbackController.getSongById(entry.getSongId());
             rows[i][0] = String.valueOf(entry.getSongId());
-            rows[i][1] = song != null ? song.getTitle() : "(deleted)";
-            rows[i][2] = song != null ? song.getArtist() : "(deleted)";
+            rows[i][1] = song != null ? song.getTitle() : AnsiColors.colorize("(deleted)", AnsiColors.DIM);
+            rows[i][2] = song != null ? song.getArtist() : AnsiColors.colorize("(deleted)", AnsiColors.DIM);
             rows[i][3] = entry.getPlayedAt().format(PLAYED_AT_FORMAT);
         }
         ConsoleTablePrinter.printTable(headers, rows);

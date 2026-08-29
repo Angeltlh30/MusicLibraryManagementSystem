@@ -17,30 +17,7 @@ public class SongView {
         this.songController = new SongController();
     }
 
-    public void showMenu() {
-        int choice;
-        do {
-            printMenu();
-            choice = Inputter.getAnInteger("Enter your choice: ", "Invalid choice, please try again: ", 0, 8);
-            handleChoice(choice);
-        } while (choice != 0);
-    }
-
-    private void printMenu() {
-        System.out.println();
-        System.out.println("========== SONG MANAGEMENT ==========");
-        System.out.println("1. Add song");
-        System.out.println("2. View song list");
-        System.out.println("3. View song detail");
-        System.out.println("4. Update song");
-        System.out.println("5. Delete song");
-        System.out.println("6. Search song");
-        System.out.println("7. Sort song list");
-        System.out.println("8. Mark/Unmark favorite");
-        System.out.println("0. Back");
-    }
-
-    private void handleChoice(int choice) {
+    void handleChoice(int choice) {
         switch (choice) {
             case 1:
                 addSong();
@@ -66,9 +43,6 @@ public class SongView {
             case 8:
                 toggleFavorite();
                 break;
-            case 0:
-                System.out.println("Back to main menu.");
-                break;
         }
     }
 
@@ -81,10 +55,10 @@ public class SongView {
 
         try {
             Song song = songController.addSong(title, artist, album, genre, duration);
-            System.out.println("Song added successfully, id = " + song.getId());
+            System.out.println(AnsiColors.colorize("Song added successfully, id = " + song.getId(), AnsiColors.SUCCESS));
             printSongsTable(Collections.singletonList(song));
         } catch (IllegalArgumentException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println(AnsiColors.colorize("Error: " + e.getMessage(), AnsiColors.ERROR));
         }
     }
 
@@ -103,7 +77,7 @@ public class SongView {
             Song song = songController.getSongById(id);
             printSongsTable(Collections.singletonList(song));
         } catch (SongNotFoundException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println(AnsiColors.colorize("Error: " + e.getMessage(), AnsiColors.ERROR));
         }
     }
 
@@ -113,7 +87,7 @@ public class SongView {
         try {
             existing = songController.getSongById(id);
         } catch (SongNotFoundException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println(AnsiColors.colorize("Error: " + e.getMessage(), AnsiColors.ERROR));
             return;
         }
 
@@ -131,10 +105,10 @@ public class SongView {
 
         try {
             Song updated = songController.updateSong(id, title, artist, album, genre, duration);
-            System.out.println("Updated successfully.");
+            System.out.println(AnsiColors.colorize("Updated successfully.", AnsiColors.SUCCESS));
             printSongsTable(Collections.singletonList(updated));
         } catch (SongNotFoundException | IllegalArgumentException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println(AnsiColors.colorize("Error: " + e.getMessage(), AnsiColors.ERROR));
         }
     }
 
@@ -144,7 +118,7 @@ public class SongView {
         try {
             existing = songController.getSongById(id);
         } catch (SongNotFoundException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println(AnsiColors.colorize("Error: " + e.getMessage(), AnsiColors.ERROR));
             return;
         }
 
@@ -158,9 +132,9 @@ public class SongView {
 
         try {
             songController.deleteSong(id);
-            System.out.println("Deleted successfully.");
+            System.out.println(AnsiColors.colorize("Deleted successfully.", AnsiColors.SUCCESS));
         } catch (SongNotFoundException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println(AnsiColors.colorize("Error: " + e.getMessage(), AnsiColors.ERROR));
         }
     }
 
@@ -231,10 +205,11 @@ public class SongView {
         int id = Inputter.getAnPositiveInteger("Enter song id: ", "Id must be a positive integer: ");
         try {
             Song song = songController.toggleFavorite(id);
-            System.out.println(song.isFavorite() ? "Song marked as favorite." : "Song removed from favorites.");
+            String message = song.isFavorite() ? "Song marked as favorite." : "Song removed from favorites.";
+            System.out.println(AnsiColors.colorize(message, AnsiColors.SUCCESS));
             printSongsTable(Collections.singletonList(song));
         } catch (SongNotFoundException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println(AnsiColors.colorize("Error: " + e.getMessage(), AnsiColors.ERROR));
         }
     }
 
@@ -254,7 +229,7 @@ public class SongView {
             rows[i][5] = s.getDurationInSeconds() + "s";
             rows[i][6] = String.valueOf(s.getPlayCount());
             rows[i][7] = String.valueOf(s.getRating());
-            rows[i][8] = s.isFavorite() ? "Yes" : "No";
+            rows[i][8] = s.isFavorite() ? AnsiColors.colorize("Yes", AnsiColors.ACCENT) : "No";
         }
         return rows;
     }

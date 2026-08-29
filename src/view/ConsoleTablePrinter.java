@@ -5,19 +5,20 @@ public class ConsoleTablePrinter {
     public static void printTable(String[] headers, String[][] rows) {
         int[] widths = new int[headers.length];
         for (int c = 0; c < headers.length; c++) {
-            widths[c] = headers[c].length();
+            widths[c] = AnsiColors.visibleLength(headers[c]);
         }
         for (String[] row : rows) {
             for (int c = 0; c < row.length; c++) {
                 String value = row[c] == null ? "" : row[c];
-                if (value.length() > widths[c]) {
-                    widths[c] = value.length();
+                int length = AnsiColors.visibleLength(value);
+                if (length > widths[c]) {
+                    widths[c] = length;
                 }
             }
         }
 
         printSeparator(widths);
-        printRow(headers, widths);
+        printHeaderRow(headers, widths);
         printSeparator(widths);
         for (String[] row : rows) {
             printRow(row, widths);
@@ -33,18 +34,31 @@ public class ConsoleTablePrinter {
             }
             line.append('+');
         }
+        System.out.println(AnsiColors.colorize(line.toString(), AnsiColors.BORDER));
+    }
+
+    private static void printHeaderRow(String[] headers, int[] widths) {
+        StringBuilder line = new StringBuilder(AnsiColors.colorize("|", AnsiColors.BORDER));
+        for (int c = 0; c < headers.length; c++) {
+            String value = headers[c];
+            line.append(' ').append(AnsiColors.colorize(value, AnsiColors.HEADER));
+            for (int i = AnsiColors.visibleLength(value); i < widths[c]; i++) {
+                line.append(' ');
+            }
+            line.append(' ').append(AnsiColors.colorize("|", AnsiColors.BORDER));
+        }
         System.out.println(line);
     }
 
     private static void printRow(String[] cells, int[] widths) {
-        StringBuilder line = new StringBuilder("|");
+        StringBuilder line = new StringBuilder(AnsiColors.colorize("|", AnsiColors.BORDER));
         for (int c = 0; c < cells.length; c++) {
             String value = cells[c] == null ? "" : cells[c];
             line.append(' ').append(value);
-            for (int i = value.length(); i < widths[c]; i++) {
+            for (int i = AnsiColors.visibleLength(value); i < widths[c]; i++) {
                 line.append(' ');
             }
-            line.append(" |");
+            line.append(' ').append(AnsiColors.colorize("|", AnsiColors.BORDER));
         }
         System.out.println(line);
     }

@@ -19,32 +19,7 @@ public class PlaylistView {
         this.playlistController = new PlaylistController();
     }
 
-    public void showMenu() {
-        int choice;
-        do {
-            printMenu();
-            choice = Inputter.getAnInteger("Enter your choice: ", "Invalid choice, please try again: ", 0, 10);
-            handleChoice(choice);
-        } while (choice != 0);
-    }
-
-    private void printMenu() {
-        System.out.println();
-        System.out.println("========== PLAYLIST MANAGEMENT ==========");
-        System.out.println("1. Create playlist");
-        System.out.println("2. View playlist list");
-        System.out.println("3. View playlist detail");
-        System.out.println("4. Update playlist");
-        System.out.println("5. Delete playlist");
-        System.out.println("6. Add song to playlist");
-        System.out.println("7. Remove song from playlist");
-        System.out.println("8. Search songs in playlist");
-        System.out.println("9. Undo last add/remove song");
-        System.out.println("10. Redo last undone action");
-        System.out.println("0. Back");
-    }
-
-    private void handleChoice(int choice) {
+    void handleChoice(int choice) {
         switch (choice) {
             case 1:
                 createPlaylist();
@@ -76,9 +51,6 @@ public class PlaylistView {
             case 10:
                 redoAction();
                 break;
-            case 0:
-                System.out.println("Back to main menu.");
-                break;
         }
     }
 
@@ -88,10 +60,10 @@ public class PlaylistView {
 
         try {
             Playlist playlist = playlistController.createPlaylist(name, description);
-            System.out.println("Playlist created successfully, id = " + playlist.getId());
+            System.out.println(AnsiColors.colorize("Playlist created successfully, id = " + playlist.getId(), AnsiColors.SUCCESS));
             printPlaylistsTable(Collections.singletonList(playlist));
         } catch (IllegalArgumentException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println(AnsiColors.colorize("Error: " + e.getMessage(), AnsiColors.ERROR));
         }
     }
 
@@ -111,7 +83,7 @@ public class PlaylistView {
             printPlaylistsTable(Collections.singletonList(playlist));
             printSongsInPlaylist(id);
         } catch (PlaylistNotFoundException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println(AnsiColors.colorize("Error: " + e.getMessage(), AnsiColors.ERROR));
         }
     }
 
@@ -121,7 +93,7 @@ public class PlaylistView {
         try {
             existing = playlistController.getPlaylistById(id);
         } catch (PlaylistNotFoundException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println(AnsiColors.colorize("Error: " + e.getMessage(), AnsiColors.ERROR));
             return;
         }
 
@@ -134,10 +106,10 @@ public class PlaylistView {
 
         try {
             Playlist updated = playlistController.updatePlaylist(id, name, description);
-            System.out.println("Updated successfully.");
+            System.out.println(AnsiColors.colorize("Updated successfully.", AnsiColors.SUCCESS));
             printPlaylistsTable(Collections.singletonList(updated));
         } catch (PlaylistNotFoundException | IllegalArgumentException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println(AnsiColors.colorize("Error: " + e.getMessage(), AnsiColors.ERROR));
         }
     }
 
@@ -156,10 +128,10 @@ public class PlaylistView {
 
             if (playlistController.isPlaylistNameTaken(name, excludeId)) {
                 if (isUpdate) {
-                    System.out.println("Error: Playlist name \"" + name + "\" already exists. "
-                            + "Enter a different name, or press Enter to keep the current name (" + currentName + ").");
+                    System.out.println(AnsiColors.colorize("Error: Playlist name \"" + name + "\" already exists. "
+                            + "Enter a different name, or press Enter to keep the current name (" + currentName + ").", AnsiColors.ERROR));
                 } else {
-                    System.out.println("Error: Playlist name \"" + name + "\" already exists. Please enter a different name.");
+                    System.out.println(AnsiColors.colorize("Error: Playlist name \"" + name + "\" already exists. Please enter a different name.", AnsiColors.ERROR));
                 }
                 continue;
             }
@@ -173,7 +145,7 @@ public class PlaylistView {
         try {
             existing = playlistController.getPlaylistById(id);
         } catch (PlaylistNotFoundException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println(AnsiColors.colorize("Error: " + e.getMessage(), AnsiColors.ERROR));
             return;
         }
 
@@ -187,9 +159,9 @@ public class PlaylistView {
 
         try {
             playlistController.deletePlaylist(id);
-            System.out.println("Deleted successfully.");
+            System.out.println(AnsiColors.colorize("Deleted successfully.", AnsiColors.SUCCESS));
         } catch (PlaylistNotFoundException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println(AnsiColors.colorize("Error: " + e.getMessage(), AnsiColors.ERROR));
         }
     }
 
@@ -198,7 +170,7 @@ public class PlaylistView {
         try {
             playlistController.getPlaylistById(playlistId);
         } catch (PlaylistNotFoundException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println(AnsiColors.colorize("Error: " + e.getMessage(), AnsiColors.ERROR));
             return;
         }
 
@@ -206,10 +178,10 @@ public class PlaylistView {
 
         try {
             playlistController.addSongToPlaylist(playlistId, songId);
-            System.out.println("Song added to playlist successfully.");
+            System.out.println(AnsiColors.colorize("Song added to playlist successfully.", AnsiColors.SUCCESS));
             printSongsInPlaylist(playlistId);
         } catch (PlaylistNotFoundException | SongNotFoundException | IllegalArgumentException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println(AnsiColors.colorize("Error: " + e.getMessage(), AnsiColors.ERROR));
         }
     }
 
@@ -219,7 +191,7 @@ public class PlaylistView {
         try {
             playlist = playlistController.getPlaylistById(playlistId);
         } catch (PlaylistNotFoundException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println(AnsiColors.colorize("Error: " + e.getMessage(), AnsiColors.ERROR));
             return;
         }
 
@@ -232,10 +204,10 @@ public class PlaylistView {
 
         try {
             playlistController.removeSongFromPlaylist(playlistId, songId);
-            System.out.println("Song removed from playlist successfully.");
+            System.out.println(AnsiColors.colorize("Song removed from playlist successfully.", AnsiColors.SUCCESS));
             printSongsInPlaylist(playlistId);
         } catch (PlaylistNotFoundException | IllegalArgumentException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println(AnsiColors.colorize("Error: " + e.getMessage(), AnsiColors.ERROR));
         }
     }
 
@@ -244,7 +216,7 @@ public class PlaylistView {
         try {
             playlistController.getPlaylistById(playlistId);
         } catch (PlaylistNotFoundException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println(AnsiColors.colorize("Error: " + e.getMessage(), AnsiColors.ERROR));
             return;
         }
 
@@ -269,7 +241,7 @@ public class PlaylistView {
                     break;
             }
         } catch (PlaylistNotFoundException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println(AnsiColors.colorize("Error: " + e.getMessage(), AnsiColors.ERROR));
             return;
         }
 
@@ -283,22 +255,22 @@ public class PlaylistView {
     private void undoAction() {
         try {
             String message = playlistController.undo();
-            System.out.println(message);
+            System.out.println(AnsiColors.colorize(message, AnsiColors.SUCCESS));
         } catch (IllegalStateException e) {
-            System.out.println(e.getMessage());
+            System.out.println(AnsiColors.colorize(e.getMessage(), AnsiColors.WARNING));
         } catch (PlaylistNotFoundException | SongNotFoundException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println(AnsiColors.colorize("Error: " + e.getMessage(), AnsiColors.ERROR));
         }
     }
 
     private void redoAction() {
         try {
             String message = playlistController.redo();
-            System.out.println(message);
+            System.out.println(AnsiColors.colorize(message, AnsiColors.SUCCESS));
         } catch (IllegalStateException e) {
-            System.out.println(e.getMessage());
+            System.out.println(AnsiColors.colorize(e.getMessage(), AnsiColors.WARNING));
         } catch (PlaylistNotFoundException | SongNotFoundException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println(AnsiColors.colorize("Error: " + e.getMessage(), AnsiColors.ERROR));
         }
     }
 
@@ -312,7 +284,7 @@ public class PlaylistView {
             System.out.println("Songs in this playlist:");
             ConsoleTablePrinter.printTable(SongView.TABLE_HEADERS, SongView.buildRows(songs));
         } catch (PlaylistNotFoundException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println(AnsiColors.colorize("Error: " + e.getMessage(), AnsiColors.ERROR));
         }
     }
 
